@@ -1,4 +1,5 @@
 import { level } from './level.js';
+import Stage from './lib/stage.js';
 
 (() => {
 
@@ -45,28 +46,12 @@ import { level } from './level.js';
   let cells    = [];
 
   let tileToPixel = function(t)     { return t*TILE;},
-      pixelToCell   = function(p)     { return Math.floor(p/TILE);},
-      cell          = function(x,y)   { return tileCell(pixelToCell(x),pixelToCell(y));},
+      pixelToTile   = function(p)     { return Math.floor(p/TILE);},
       tileCell      = function(tx,ty) { return cells[tx + (ty*MAP.totalWidth)];};
 
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
-    renderMap(ctx);
-  }
-
-  function renderMap(ctx) {
-    let x;
-    let y;
-    let cell;
-    for(y = 0 ; y < MAP.totalHeight ; y++) {
-      for(x = 0 ; x < MAP.totalWidth ; x++) {
-        cell = tileCell(x, y);
-        if (cell) {
-          ctx.fillStyle = COLORS[cell - 1];
-          ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
-        }
-      }
-    }
+    cells.render(ctx);
   }
 
   function setup(map) {
@@ -75,7 +60,7 @@ import { level } from './level.js';
     let n;
     let obj;
     let entity;
-    cells = data;
+    cells = new Stage(data, MAP.totalWidth, MAP.totalHeight);
   }
 
   let dt = 0;
