@@ -1,21 +1,9 @@
 import { level } from './level.js';
 import Stage from './lib/stage.js';
 import Player from './lib/player.js';
+import * as GameUtil from './lib/utils.js';
 
 (() => {
-
-  const MAP      = { totalWidth: 64, totalHeight: 48 };
-  const TILE     = 32;
-  const METER    = TILE;
-  const GRAVITY  = 9.8 * 6;
-  const MAXDX    = 15;
-  const MAXDY    = 60;
-  const ACCEL    = 1/2;
-  const FRICTION = 1/6;
-  const JUMP  = 1500;
-  const COLOR    = { BLACK: '#000000', YELLOW: '#ECD078', BRICK: '#D95B43', PINK: '#C02942', PURPLE: '#542437', GREY: '#333', SLATE: '#53777A', GOLD: 'gold' };
-  const COLORS   = [ COLOR.YELLOW, COLOR.BRICK, COLOR.PINK, COLOR.PURPLE, COLOR.GREY ];
-  const KEY      = { SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
 
   if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = window.webkitRequestAnimationFrame ||
@@ -40,26 +28,21 @@ import Player from './lib/player.js';
   let step     = 1/fps;
   let canvas   = document.getElementById('canvas');
   let ctx      = canvas.getContext('2d');
-  let width    = canvas.width  = MAP.totalWidth * TILE;
-  let height   = canvas.height = MAP.totalHeight * TILE;
+  let width    = canvas.width  = GameUtil.MAP.totalWidth * GameUtil.TILE;
+  let height   = canvas.height = GameUtil.MAP.totalHeight * GameUtil.TILE;
   let player   = {};
   let monsters = [];
   let treasure = [];
   let cells    = [];
 
-  let tileToPixel = function(t)     { return t*TILE;};
-  let pixelToTile   = function(p)     { return Math.floor(p/TILE);};
-  let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*MAP.totalWidth)];};
+  let tileToPixel = function(t)     { return t*GameUtil.TILE;};
+  let pixelToTile   = function(p)     { return Math.floor(p/GameUtil.TILE);};
+  let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
 
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
     cells.render(ctx);
-    renderPlayer(player, ctx, dt);
-  }
-
-  function renderPlayer(player, ctx, dt) {
-    ctx.fillStyle = COLOR.YELLOW;
-    ctx.fillRect(player.state.x + (player.state.dx * dt), player.state.y + (player.state.dy * dt), TILE, TILE);
+    player.render(ctx, dt);
   }
 
   function setup(map) {
@@ -68,30 +51,31 @@ import Player from './lib/player.js';
     let n;
     let obj;
     let entity;
-    cells = new Stage(data, MAP.totalWidth, MAP.totalHeight);
+    cells = new Stage(data, GameUtil.MAP.totalWidth, GameUtil.MAP.totalHeight);
     for(n = 0 ; n < objects.length ; n++) {
       obj = objects[n];
       entity = setupEntity(obj);
       switch(obj.type) {
       case "player":
-        player = new Player(entity, COLOR.YELLOW);
+        player = new Player(entity, GameUtil.COLOR.YELLOW);
       break;
       }
     }
   }
 
   function setupEntity(obj) {
+
     let entity = {};
     entity.x        = obj.x;
     entity.y        = obj.y;
     entity.dx       = 0;
     entity.dy       = 0;
-    entity.gravity  = METER * (GRAVITY);
-    entity.maxdx    = METER * (MAXDX);
-    entity.maxdy    = METER * (MAXDY);
-    entity.jump  = METER * (obj.properties.jump || JUMP);
-    entity.accel    = entity.maxdx / (obj.properties.accel    || ACCEL);
-    entity.friction = entity.maxdx / (obj.properties.friction || FRICTION);
+    entity.gravity  = GameUtil.METER * (GameUtil.GRAVITY);
+    entity.maxdx    = GameUtil.METER * (GameUtil.MAXDX);
+    entity.maxdy    = GameUtil.METER * (GameUtil.MAXDY);
+    entity.impulse  = GameUtil.METER * (obj.properties.impulse || GameUtil.IMPULSE);
+    entity.accel    = entity.maxdx / (obj.properties.accel    || GameUtil.ACCEL);
+    entity.friction = entity.maxdx / (obj.properties.friction || GameUtil.FRICTION);
     entity.player   = obj.type == "player";
     entity.left     = obj.properties.left;
     entity.right    = obj.properties.right;
@@ -105,58 +89,104 @@ import Player from './lib/player.js';
   }
 
   function updatePlayer(dt) {
-
-    player.updatePos(dt);
-    checkCollision(player, dt);
+    updateEntity(player, dt);
   }
 
-  function checkCollision(obj, dt) {
-    let cell = tileCell(obj.state.tileX, obj.state.tileY);
-    let cellBelow = tileCell(obj.state.tileX, obj.state.tileY + 1);
-    let cellRight = tileCell(obj.state.tileX + 1, obj.state.tileY);
-    let cellDiag = tileCell(obj.state.tileX + 1, obj.state.tileY + 1);
+  function updateEntity(player, dt) {
+    let entity = player.state;
+    let wasLeft = entity.dx  < 0;
+    let wasRight = entity.dx  > 0;
+    let falling = entity.falling;
+    let friction = entity.friction * (falling ? 0.5 : 1);
+    let accel = entity.accel    * (falling ? 0.5 : 1);
 
-// ----- landing on cell, standing on a cell, no cell right, overlapping next tile
-    if (obj.state.dy > 0) {
-      if ((cellBelow && !cell) || (cellDiag && !cellRight && nX)) {
-        obj.changeState({
-          'y': tileToPixel(tileY),
-          'dy': 0,
-          'falling': false,
-          'jumping': false,
-          'nY': 0
-        });
-      }
-    } else if (obj.state.dy < 0) {
-      if ((cell && !cellBelow) || (cellRight && !cellDiag && nX)) {
-        obj.changeState({
-          'y': tileToPixel(obj.state.tileY + 1),
-          'dy': 0,
-          'nY': 0
-        });
-        cell      = cellBelow;
-        cellRight = cellDiag;
-      }
-    }
+      entity.ddx = 0;
+      entity.ddy = entity.gravity;
 
-    if (obj.state.dx > 0) {
-      if ((cellRight && !cell) || (cellDiag  && !cellBelow && obj.state.ny)) {
-        obj.changeState({
-          'x': tileToPixel(obj.state.tileX),
-          'dx': 0
-        });
+      if (entity.left)
+        entity.ddx = entity.ddx - accel;
+      else if (wasLeft)
+        entity.ddx = entity.ddx + friction;
+
+      if (entity.right)
+        entity.ddx = entity.ddx + accel;
+      else if (wasRight)
+        entity.ddx = entity.ddx - friction;
+
+      if (entity.jump && !entity.jumping && !falling) {
+        entity.ddy = entity.ddy - entity.impulse; // an instant big force impulse
+        entity.jumping = true;
       }
-    }
-    else if (obj.state.dx < 0) {
-      if ((cell     && !cellRight) || (cellBelow && !cellDiag && obj.state.nY)) {
-        obj.changeState({
-          'x': tileToPixel(tileX + 1),
-          'dx': 0
-        });
+
+      entity.x  = entity.x  + (dt * entity.dx);
+      entity.y  = entity.y  + (dt * entity.dy);
+      entity.dx = bound(entity.dx + (dt * entity.ddx), -entity.maxdx, entity.maxdx);
+      entity.dy = bound(entity.dy + (dt * entity.ddy), -entity.maxdy, entity.maxdy);
+
+      if ((wasLeft  && (entity.dx > 0)) ||
+          (wasRight && (entity.dx < 0))) {
+        entity.dx = 0; // clamp at zero to prevent friction from making us jiggle side to side
       }
+
+      let tx = pixelToTile(entity.x);
+      let ty = pixelToTile(entity.y);
+      let nx = entity.x%GameUtil.TILE;
+      let ny = entity.y%GameUtil.TILE;
+      let cell = tileCell(tx,     ty);
+      let cellright = tileCell(tx + 1, ty);
+      let celldown  = tileCell(tx,     ty + 1);
+      let celldiag  = tileCell(tx + 1, ty + 1);
+
+      if (entity.dy > 0) {
+        if ((celldown && !cell) ||
+            (celldiag && !cellright && nx)) {
+          entity.y = tileToPixel(ty);
+          entity.dy = 0;
+          entity.falling = false;
+          entity.jumping = false;
+          ny = 0;
+        }
+      }
+      else if (entity.dy < 0) {
+        if ((cell      && !celldown) ||
+            (cellright && !celldiag && nx)) {
+          entity.y = tileToPixel(ty + 1);
+          entity.dy = 0;
+          cell      = celldown;
+          cellright = celldiag;
+          ny        = 0;
+        }
+      }
+
+      if (entity.dx > 0) {
+        if ((cellright && !cell) ||
+            (celldiag  && !celldown && ny)) {
+          entity.x = tileToPixel(tx);
+          entity.dx = 0;
+        }
+      }
+      else if (entity.dx < 0) {
+        if ((cell     && !cellright) ||
+            (celldown && !celldiag && ny)) {
+          entity.x = tileToPixel(tx + 1);
+          entity.dx = 0;
+        }
+      }
+
+      if (entity.monster) {
+        if (entity.left && (cell || !celldown)) {
+          entity.left = false;
+          entity.right = true;
+        }
+        else if (entity.right && (cellright || !celldiag)) {
+          entity.right = false;
+          entity.left  = true;
+        }
+      }
+
+      entity.falling = ! (celldown || (nx && celldiag));
+
     }
-    obj.changeState({'falling': !(cellBelow || (obj.state.nX && cellDiag))});
-  }
 
   let dt = 0;
   let now;
@@ -171,6 +201,7 @@ import Player from './lib/player.js';
       dt -= step;
       update(step);
     }
+
     render(ctx, dt);
     last = now;
     fpsmeter.tick();
@@ -180,16 +211,16 @@ import Player from './lib/player.js';
   function onKey (e, key, down) {
 
     switch(key) {
-      case KEY.LEFT:
+      case GameUtil.KEY.LEFT:
         player.changeState({'left': down});
         e.preventDefault(); return false;
-      case KEY.RIGHT:
+      case GameUtil.KEY.RIGHT:
         player.changeState({'right': down});
         e.preventDefault();
         return false;
-      case KEY.SPACE:
+      case GameUtil.KEY.SPACE:
         player.changeState({'jump': down});
-        ev.preventDefault();
+        e.preventDefault();
         return false;
     }
   }
