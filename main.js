@@ -276,6 +276,9 @@ let fired = false;
         player.changeState({'jump': down});
         e.preventDefault();
         return false;
+      case GameUtil.KEY.Z:
+        player.attack();
+      return false;
     }
   }
 
