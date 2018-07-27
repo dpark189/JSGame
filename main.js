@@ -266,10 +266,10 @@ let fired = false;
   function onKey (e, key, down) {
     switch(key) {
       case GameUtil.KEY.LEFT:
-        player.changeState({'left': down});
+        player.changeState({'left': down, 'facing': false});
         e.preventDefault(); return false;
       case GameUtil.KEY.RIGHT:
-        player.changeState({'right': down});
+        player.changeState({'right': down, 'facing': true});
         e.preventDefault();
         return false;
       case GameUtil.KEY.SPACE:
