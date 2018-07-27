@@ -21,6 +21,8 @@ import SpriteSheet from './assets/sprite_sheet.js';
     run_right_sprite: [],
     jump_left_sprite: [],
     jump_right_sprite: [],
+    fall_left_sprite: [],
+    fall_right_sprite: []
   };
   let frameSpeed = 90;
   let idle_image;
@@ -28,6 +30,25 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let run_right_image;
   let jump_left_image;
   let jump_right_image;
+  let fall_right_image;
+  let fall_left_image;
+
+  for (let i = 1; i <= 2; i++) {
+    fall_left_image = new Image();
+    fall_left_image.src = (`./assets/player_sprite/fall_left${i}.png`);
+    player_assets.fall_left_sprite.push({
+      frame: fall_left_image,
+      speed: 60
+    });
+  }
+  for (let i = 1; i <= 2; i++) {
+    fall_right_image = new Image();
+    fall_right_image.src = (`./assets/player_sprite/fall_right${i}.png`);
+    player_assets.fall_right_sprite.push({
+      frame: fall_right_image,
+      speed: 60
+    });
+  }
   for (let i = 1; i <= 4; i++) {
     idle_image = new Image();
     idle_image.src = (`./assets/player_sprite/idle${i}.png`);
@@ -41,7 +62,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     jump_left_image.src = (`./assets/player_sprite/jump_left${i}.png`);
     player_assets.jump_left_sprite.push({
       frame: jump_left_image,
-      speed: frameSpeed * 2
+      speed: 60
     });
   }
   for (let i = 1; i <= 10; i++) {
@@ -49,7 +70,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     jump_right_image.src = (`./assets/player_sprite/jump_right${i}.png`);
     player_assets.jump_right_sprite.push({
       frame: jump_right_image,
-      speed: frameSpeed * 2
+      speed: 60
     });
   }
   for (let i = 1; i <= 6; i++) {
@@ -171,9 +192,13 @@ import SpriteSheet from './assets/sprite_sheet.js';
         entity.ddx = entity.ddx - friction;
 
       if (entity.jump && !entity.jumping && !falling) {
-
         entity.ddy = entity.ddy - entity.impulse; // an instant big force impulse
         entity.jumping = true;
+      }
+
+      if (entity.dy > 0) {
+        entity.jumping = false;
+        entity.falling = true;
       }
 
       entity.x  = entity.x  + (dt * entity.dx);
@@ -200,7 +225,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
             (celldiag && !cellright && nx)) {
           entity.y = tileToPixel(ty);
           entity.dy = 0;
-          entity.falling = false;
+          entity.falling = true;
           entity.jumping = false;
           ny = 0;
         }
@@ -243,7 +268,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
       }
       player.tick();
       entity.falling = ! (celldown || (nx && celldiag));
+      if (entity.falling) {
 
+      }
     }
 
   let dt = 0;
