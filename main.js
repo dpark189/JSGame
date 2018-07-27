@@ -16,80 +16,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
                                      window.setTimeout(callback, 1000 / 60);
                                    };
   }
-  let player_assets = {
-    idle_sprite: [],
-    run_left_sprite: [],
-    run_right_sprite: [],
-    jump_left_sprite: [],
-    jump_right_sprite: [],
-    fall_left_sprite: [],
-    fall_right_sprite: []
-  };
-  let frameSpeed = 90;
-  let idle_image;
-  let run_left_image;
-  let run_right_image;
-  let jump_left_image;
-  let jump_right_image;
-  let fall_right_image;
-  let fall_left_image;
 
-  for (let i = 1; i <= 2; i++) {
-    fall_left_image = new Image();
-    fall_left_image.src = (`./assets/player_sprite/fall_left${i}.png`);
-    player_assets.fall_left_sprite.push({
-      frame: fall_left_image,
-      speed: 60
-    });
-  }
-  for (let i = 1; i <= 2; i++) {
-    fall_right_image = new Image();
-    fall_right_image.src = (`./assets/player_sprite/fall_right${i}.png`);
-    player_assets.fall_right_sprite.push({
-      frame: fall_right_image,
-      speed: 60
-    });
-  }
-  for (let i = 1; i <= 4; i++) {
-    idle_image = new Image();
-    idle_image.src = (`./assets/player_sprite/idle${i}.png`);
-    player_assets.idle_sprite.push({
-      frame: idle_image,
-      speed: 90
-    });
-  }
-  for (let i = 1; i <= 10; i++) {
-    jump_left_image = new Image();
-    jump_left_image.src = (`./assets/player_sprite/jump_left${i}.png`);
-    player_assets.jump_left_sprite.push({
-      frame: jump_left_image,
-      speed: 60
-    });
-  }
-  for (let i = 1; i <= 10; i++) {
-    jump_right_image = new Image();
-    jump_right_image.src = (`./assets/player_sprite/jump_right${i}.png`);
-    player_assets.jump_right_sprite.push({
-      frame: jump_right_image,
-      speed: 60
-    });
-  }
-  for (let i = 1; i <= 6; i++) {
-    run_right_image = new Image();
-    run_right_image.src = (`./assets/player_sprite/run_right${i}.png`);
-    player_assets.run_right_sprite.push({
-      frame: run_right_image,
-      speed: frameSpeed
-    });
-  }
-  for (let i = 1; i <= 6; i++) {
-    run_left_image = new Image();
-    run_left_image.src = (`./assets/player_sprite/run_left${i}.png`);
-    player_assets.run_left_sprite.push({
-      frame: run_left_image,
-      speed: frameSpeed
-    });
-  }
+  const player_assets = GameUtil.loadPlayerImages();
+  const monster_assets = GameUtil.loadMonsterImages();
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -144,7 +73,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
         player = new Player(entity, player_assets);
       break;
       case "monster":
-        monster = new Monster(entity);
+        monster = new Monster(entity, monster_assets);
         monsters.push(monster);
       break;
       }
@@ -308,10 +237,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
           entity.left  = true;
         }
       }
-      if (entity.player) {
-        object.tick();
-        entity.falling = ! (celldown || (nx && celldiag));
-      }
+
+      object.tick();
+      entity.falling = ! (celldown || (nx && celldiag));
     }
 
   let dt = 0;
