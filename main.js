@@ -110,7 +110,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let treasure = [];
   let cells    = [];
 
-  let tileToPixel = function(t)     { return t*GameUtil.TILE;};
+  let tileToPixel   = function(t)     { return t*GameUtil.TILE;};
   let pixelToTile   = function(p)     { return Math.floor(p/GameUtil.TILE);};
   let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
 
@@ -120,10 +120,6 @@ import SpriteSheet from './assets/sprite_sheet.js';
            ((y1 + h1 - 1) < y2) ||
            ((y2 + h2 - 1) < y1));
 }
-
-  CanvasRenderingContext2D.prototype.myDrawImage = (asset, x, y, width, height) => {
-    this.drawImage(asset.sheet, asset.x, asset.y, asset.width, asset.height, x, y, widht, height);
-  };
 
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
@@ -261,7 +257,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
       let ty = pixelToTile(entity.y);
       let nx = entity.x%GameUtil.TILE;
       let ny = entity.y%GameUtil.TILE;
-      let cell = tileCell(tx,     ty);
+      let cell = tileCell(tx, ty);
       let cellright = tileCell(tx + 1, ty);
       let celldown  = tileCell(tx,     ty + 1);
       let celldiag  = tileCell(tx + 1, ty + 1);
