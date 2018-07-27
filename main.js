@@ -148,6 +148,8 @@ import SpriteSheet from './assets/sprite_sheet.js';
     entity.y        = obj.y;
     entity.dx       = 0;
     entity.dy       = 0;
+    entity.width    = obj.width;
+    entity.height    = obj.height;
     entity.gravity  = GameUtil.METER * (GameUtil.GRAVITY);
     entity.maxdx    = GameUtil.METER * (GameUtil.MAXDX);
     entity.maxdy    = GameUtil.METER * (GameUtil.MAXDY);
@@ -155,6 +157,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     entity.accel    = entity.maxdx / (obj.properties.accel    || GameUtil.ACCEL);
     entity.friction = entity.maxdx / (obj.properties.friction || GameUtil.FRICTION);
     entity.player   = obj.type == "player";
+    entity.monster   = obj.type == "monster";
     entity.left     = obj.properties.left;
     entity.right    = obj.properties.right;
     entity.start    = { x: obj.x, y: obj.y };
@@ -196,11 +199,6 @@ import SpriteSheet from './assets/sprite_sheet.js';
         entity.jumping = true;
       }
 
-      if (entity.dy > 0) {
-        entity.jumping = false;
-        entity.falling = true;
-      }
-
       entity.x  = entity.x  + (dt * entity.dx);
       entity.y  = entity.y  + (dt * entity.dy);
       entity.dx = bound(entity.dx + (dt * entity.ddx), -entity.maxdx, entity.maxdx);
@@ -225,7 +223,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
             (celldiag && !cellright && nx)) {
           entity.y = tileToPixel(ty);
           entity.dy = 0;
-          entity.falling = true;
+          entity.falling = false;
           entity.jumping = false;
           ny = 0;
         }
