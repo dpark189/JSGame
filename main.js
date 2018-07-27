@@ -2,6 +2,7 @@ import { level } from './level.js';
 import Stage from './lib/stage.js';
 import Player from './lib/player.js';
 import * as GameUtil from './lib/utils.js';
+import SpriteSheet from './assets/sprite_sheet.js';
 
 (() => {
 
@@ -14,7 +15,59 @@ import * as GameUtil from './lib/utils.js';
                                      window.setTimeout(callback, 1000 / 60);
                                    };
   }
-
+  let player_assets = {
+    idle_sprite: [],
+    run_left_sprite: [],
+    run_right_sprite: [],
+    jump_left_sprite: [],
+    jump_right_sprite: [],
+  };
+  let frameSpeed = 90;
+  let idle_image;
+  let run_left_image;
+  let run_right_image;
+  let jump_left_image;
+  let jump_right_image;
+  for (let i = 1; i <= 4; i++) {
+    idle_image = new Image();
+    idle_image.src = (`./assets/player_sprite/idle${i}.png`);
+    player_assets.idle_sprite.push({
+      frame: idle_image,
+      speed: 90
+    });
+  }
+  for (let i = 1; i <= 10; i++) {
+    jump_left_image = new Image();
+    jump_left_image.src = (`./assets/player_sprite/jump_left${i}.png`);
+    player_assets.jump_left_sprite.push({
+      frame: jump_left_image,
+      speed: frameSpeed * 2
+    });
+  }
+  for (let i = 1; i <= 10; i++) {
+    jump_right_image = new Image();
+    jump_right_image.src = (`./assets/player_sprite/jump_right${i}.png`);
+    player_assets.jump_right_sprite.push({
+      frame: jump_right_image,
+      speed: frameSpeed * 2
+    });
+  }
+  for (let i = 1; i <= 6; i++) {
+    run_right_image = new Image();
+    run_right_image.src = (`./assets/player_sprite/run_right${i}.png`);
+    player_assets.run_right_sprite.push({
+      frame: run_right_image,
+      speed: frameSpeed
+    });
+  }
+  for (let i = 1; i <= 6; i++) {
+    run_left_image = new Image();
+    run_left_image.src = (`./assets/player_sprite/run_left${i}.png`);
+    player_assets.run_left_sprite.push({
+      frame: run_left_image,
+      speed: frameSpeed
+    });
+  }
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -39,6 +92,10 @@ import * as GameUtil from './lib/utils.js';
   let pixelToTile   = function(p)     { return Math.floor(p/GameUtil.TILE);};
   let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
 
+  CanvasRenderingContext2D.prototype.myDrawImage = (asset, x, y, width, height) => {
+    this.drawImage(asset.sheet, asset.x, asset.y, asset.width, asset.height, x, y, widht, height);
+  };
+
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
     cells.render(ctx);
@@ -57,7 +114,7 @@ import * as GameUtil from './lib/utils.js';
       entity = setupEntity(obj);
       switch(obj.type) {
       case "player":
-        player = new Player(entity, GameUtil.COLOR.YELLOW);
+        player = new Player(entity, player_assets);
       break;
       }
     }
@@ -114,6 +171,7 @@ import * as GameUtil from './lib/utils.js';
         entity.ddx = entity.ddx - friction;
 
       if (entity.jump && !entity.jumping && !falling) {
+
         entity.ddy = entity.ddy - entity.impulse; // an instant big force impulse
         entity.jumping = true;
       }
@@ -183,7 +241,7 @@ import * as GameUtil from './lib/utils.js';
           entity.left  = true;
         }
       }
-
+      player.tick();
       entity.falling = ! (celldown || (nx && celldiag));
 
     }
