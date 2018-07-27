@@ -114,6 +114,13 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let pixelToTile   = function(p)     { return Math.floor(p/GameUtil.TILE);};
   let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
 
+  function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return !(((x1 + w1 - 1) < x2) ||
+           ((x2 + w2 - 1) < x1) ||
+           ((y1 + h1 - 1) < y2) ||
+           ((y2 + h2 - 1) < y1));
+}
+
   CanvasRenderingContext2D.prototype.myDrawImage = (asset, x, y, width, height) => {
     this.drawImage(asset.sheet, asset.x, asset.y, asset.width, asset.height, x, y, widht, height);
   };
@@ -153,7 +160,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
     let monster;
     for (let i = 0; i < max; i++) {
       monster = monsters[i];
-      monster.render(ctx, dt);
+      if (!monster.state.dead){
+        monster.render(ctx, dt);
+      }
     }
   }
 
@@ -191,7 +200,6 @@ import SpriteSheet from './assets/sprite_sheet.js';
   }
 
   function updateMonsters(dt) {
-    debugger
     let max = monsters.length;
     for (let i = 0; i < max; i++) {
       updateMonster(monsters[i], dt);
@@ -199,7 +207,18 @@ import SpriteSheet from './assets/sprite_sheet.js';
   }
 
   function updateMonster(monster, dt) {
-    updateEntity(monster, dt);
+    if (!monster.state.dead) {
+      updateEntity(monster, dt);
+      if (overlap(player.state.x, player.state.y, GameUtil.TILE, GameUtil.TILE, monster.state.x, monster.state.y, GameUtil.TILE, GameUtil.TILE)) {
+        if ((player.state.dy > 0) && (monster.state.y - player.state.y > GameUtil.TILE/2)) {
+          monster.killed();
+          player.state.killed++;
+
+        } else {
+          // player.killed();
+        }
+      }
+    }
   }
 
   function updateEntity(object, dt) {
