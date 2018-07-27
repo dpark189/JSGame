@@ -183,14 +183,27 @@ import SpriteSheet from './assets/sprite_sheet.js';
 
   function update(dt) {
     updatePlayer(dt);
+    updateMonsters(dt);
   }
 
   function updatePlayer(dt) {
     updateEntity(player, dt);
   }
 
-  function updateEntity(player, dt) {
-    let entity = player.state;
+  function updateMonsters(dt) {
+    debugger
+    let max = monsters.length;
+    for (let i = 0; i < max; i++) {
+      updateMonster(monsters[i], dt);
+    }
+  }
+
+  function updateMonster(monster, dt) {
+    updateEntity(monster, dt);
+  }
+
+  function updateEntity(object, dt) {
+    let entity = object.state;
     let wasLeft = entity.dx  < 0;
     let wasRight = entity.dx  > 0;
     let falling = entity.falling;
@@ -280,10 +293,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
           entity.left  = true;
         }
       }
-      player.tick();
-      entity.falling = ! (celldown || (nx && celldiag));
-      if (entity.falling) {
-
+      if (entity.player) {
+        object.tick();
+        entity.falling = ! (celldown || (nx && celldiag));
       }
     }
 
