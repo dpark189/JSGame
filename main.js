@@ -1,6 +1,7 @@
 import { level } from './level.js';
 import Stage from './lib/stage.js';
 import Player from './lib/player.js';
+import Monster from './lib/monster.js';
 import * as GameUtil from './lib/utils.js';
 import SpriteSheet from './assets/sprite_sheet.js';
 
@@ -121,6 +122,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     ctx.clearRect(0, 0, width, height);
     cells.render(ctx);
     player.render(ctx, dt);
+    renderMonsters(ctx, dt);
   }
 
   function setup(map) {
@@ -129,6 +131,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     let n;
     let obj;
     let entity;
+    let monster;
     cells = new Stage(data, GameUtil.MAP.totalWidth, GameUtil.MAP.totalHeight);
     for(n = 0 ; n < objects.length ; n++) {
       obj = objects[n];
@@ -137,7 +140,20 @@ import SpriteSheet from './assets/sprite_sheet.js';
       case "player":
         player = new Player(entity, player_assets);
       break;
+      case "monster":
+        monster = new Monster(entity);
+        monsters.push(monster);
+      break;
       }
+    }
+  }
+
+  function renderMonsters(ctx, dt) {
+    let max = monsters.length;
+    let monster;
+    for (let i = 0; i < max; i++) {
+      monster = monsters[i];
+      monster.render(ctx, dt);
     }
   }
 
