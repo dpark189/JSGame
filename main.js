@@ -293,8 +293,8 @@ import SpriteSheet from './assets/sprite_sheet.js';
     requestAnimationFrame(frame, canvas);
   }
 
+let fired = false;
   function onKey (e, key, down) {
-
     switch(key) {
       case GameUtil.KEY.LEFT:
         player.changeState({'left': down});
@@ -310,7 +310,10 @@ import SpriteSheet from './assets/sprite_sheet.js';
     }
   }
 
-  document.addEventListener('keydown', function(ev) { return onKey(ev, ev.keyCode, true);  }, false);
+// TODO: figure out how to stop holding down space bar from triggering jump
+
+  document.addEventListener('keydown', function(ev) {
+    return onKey(ev, ev.keyCode, true);  }, false);
   document.addEventListener('keyup',   function(ev) { return onKey(ev, ev.keyCode, false); }, false);
 
     setup(level);
