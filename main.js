@@ -224,7 +224,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
         entity.ddx = entity.ddx - friction;
 
       if (entity.jump && !entity.jumping && !falling) {
-        entity.ddy = entity.ddy - entity.impulse; // an instant big force impulse
+        entity.ddy = entity.ddy - entity.impulse;
         entity.jumping = true;
       }
 
@@ -235,7 +235,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
 
       if ((wasLeft  && (entity.dx > 0)) ||
           (wasRight && (entity.dx < 0))) {
-        entity.dx = 0; // clamp at zero to prevent friction from making us jiggle side to side
+        entity.dx = 0;
       }
 
       let tx = pixelToTile(entity.x);
