@@ -52,7 +52,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
 
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
-    cells.render(ctx);
+    cells.render(ctx, player);
     player.render(ctx, dt);
     renderMonsters(ctx, dt);
   }
@@ -170,7 +170,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
             )
           )
         ) {
-          
+
           monster.killed();
           player.state.killed++;
         }
@@ -310,8 +310,9 @@ let fired = false;
         e.preventDefault();
         return false;
       case GameUtil.KEY.Z:
-
-        player.changeState({'attacking': true});
+        if (!player.state.attacking) {
+          player.changeState({'attacking': true});
+        }
       return false;
     }
   }
