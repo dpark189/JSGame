@@ -39,9 +39,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let treasure = [];
   let cells    = [];
 
-  let tileToPixel   = function(t)     { return t*GameUtil.TILE;};
-  let pixelToTile   = function(p)     { return Math.floor(p/GameUtil.TILE);};
-  let tileCell      = function(tx,ty) { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
+  const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
+  const pixelToTile   = (p) =>     { return Math.floor(p/GameUtil.TILE);};
+  const tileCell      = (tx,ty) => { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
 
   function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
   return !(((x1 + w1 - 1) < x2) ||
@@ -121,16 +121,28 @@ import SpriteSheet from './assets/sprite_sheet.js';
   }
 
   function updatePlayer(dt) {
+
     updateEntity(player, dt);
   }
 
   function updateMonsters(dt) {
+
     let max = monsters.length;
     for (let i = 0; i < max; i++) {
       updateMonster(monsters[i], dt);
     }
   }
-
+// 1053.3333333333337
+// ) ||
+// (
+//   (player.state.attacking && player.state.facing) &&
+//   (monster.state.x - player.state.x < GameUtil.TILE * 3)
+// ) ||
+// (
+//   (player.state.attacking && !player.state.facing) &&
+//   (player.state.x - monster.state.x < GameUtil.TILE * 3)
+// )
+// ) {
   function updateMonster(monster, dt) {
     if (!monster.state.dead) {
       updateEntity(monster, dt);
@@ -138,11 +150,30 @@ import SpriteSheet from './assets/sprite_sheet.js';
         if ((player.state.dy > 0) && (monster.state.y - player.state.y > GameUtil.TILE/2)) {
           monster.killed();
           player.state.killed++;
-
-        } else {
-          // player.killed();
         }
       }
+      if (
+          (
+            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 1.5) &&
+            (player.state.attacking && player.state.facing) &&
+            (
+              (monster.state.x - player.state.x < GameUtil.TILE * 2) &&
+              (monster.state.x - player.state.x > 0)
+            )
+          ) ||
+          (
+            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 1.5) &&
+            (player.state.attacking && !player.state.facing) &&
+            (
+              (player.state.x - monster.state.x < GameUtil.TILE * 2) &&
+              (player.state.x - monster.state.x > 0)
+            )
+          )
+        ) {
+          
+          monster.killed();
+          player.state.killed++;
+        }
     }
   }
 
@@ -153,6 +184,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
     let falling = entity.falling;
     let friction = entity.friction * (falling ? 0.5 : 1);
     let accel = entity.accel    * (falling ? 0.5 : 1);
+    let attacking = entity.attacking;
 
       entity.ddx = 0;
       entity.ddy = entity.gravity;
@@ -239,6 +271,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
       }
 
       object.tick();
+
       entity.falling = ! (celldown || (nx && celldiag));
     }
 
@@ -277,7 +310,8 @@ let fired = false;
         e.preventDefault();
         return false;
       case GameUtil.KEY.Z:
-        player.attack();
+
+        player.changeState({'attacking': true});
       return false;
     }
   }
