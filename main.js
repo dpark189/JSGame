@@ -19,6 +19,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
 
   const player_assets = GameUtil.loadPlayerImages();
   const monster_assets = GameUtil.loadMonsterImages();
+  const background = GameUtil.loadBackground();
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -52,7 +53,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
 
   function render(ctx, frame, dt) {
     ctx.clearRect(0, 0, width, height);
-    cells.render(ctx, player);
+    cells.render(ctx);
     player.render(ctx, dt);
     renderMonsters(ctx, dt);
   }
@@ -154,18 +155,18 @@ import SpriteSheet from './assets/sprite_sheet.js';
       }
       if (
           (
-            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 1.5) &&
+            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 2) &&
             (player.state.attacking && player.state.facing) &&
             (
-              (monster.state.x - player.state.x < GameUtil.TILE * 2) &&
+              (monster.state.x - player.state.x < GameUtil.TILE * 2.5) &&
               (monster.state.x - player.state.x > 0)
             )
           ) ||
           (
-            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 1.5) &&
+            (Math.abs(player.state.y - monster.state.y) < GameUtil.TILE * 2) &&
             (player.state.attacking && !player.state.facing) &&
             (
-              (player.state.x - monster.state.x < GameUtil.TILE * 2) &&
+              (player.state.x - monster.state.x < GameUtil.TILE * 2.5) &&
               (player.state.x - monster.state.x > 0)
             )
           )
