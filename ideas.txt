@@ -1,0 +1,1 @@
+create an attack object that spawns when entities attack instead of fixing attacks on entities themselves.
