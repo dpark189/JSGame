@@ -17,6 +17,17 @@
   opacity: 0.6;
 }
 
+#win-screen {
+  display: none;
+  position: absolute;
+  background-color: black;
+  display: none;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  opacity: 0.6;
+}
+
 body {
   background: #999;
 }

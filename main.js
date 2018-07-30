@@ -23,8 +23,6 @@ import MainMenu from './lib/main_menu.js';
   const background = GameUtil.loadBackground();
   const mapTiles = GameUtil.loadMapTextures();
   const exit_assets = GameUtil.loadExit();
-  ,
-
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
   }
@@ -47,8 +45,10 @@ import MainMenu from './lib/main_menu.js';
   const mainMenu = document.getElementById('main-menu');
   const gameOver = document.getElementById('game-over');
   const retryButton = document.getElementById('retry-button');
+  const playAgainButton = document.getElementById('play-again');
+  const winScreen = document.getElementById('win-screen');
   let playing = false;
-
+  let win = false;
   const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
   const pixelToTile   = (p) =>     { return Math.floor(p/GameUtil.TILE);};
   const tileCell      = (tx,ty) => { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
@@ -132,6 +132,13 @@ import MainMenu from './lib/main_menu.js';
   }
 
   function updatePlayer(dt) {
+    if (typeof cells.exitX !== 'undefined') {
+
+      if (overlap(pixelToTile(player.state.x), pixelToTile(player.state.y), 1, 1, cells.exitX, cells.exitY, 1, 1)) {
+
+        win = true;
+      }
+    }
     if (!player.state.dead) {
       updateEntity(player, dt);
     } else {
@@ -233,10 +240,10 @@ import MainMenu from './lib/main_menu.js';
       let ty = pixelToTile(entity.y);
       let nx = entity.x%GameUtil.TILE;
       let ny = entity.y%GameUtil.TILE;
-      let cell = tileCell(tx, ty);
-      let cellright = tileCell(tx + 1, ty);
-      let celldown  = tileCell(tx,     ty + 1);
-      let celldiag  = tileCell(tx + 1, ty + 1);
+      let cell = tileCell(tx, ty) === 6 ? 0 : tileCell(tx, ty);
+      let cellright = tileCell(tx + 1, ty) === 6 ? 0 : tileCell(tx + 1, ty);
+      let celldown  = tileCell(tx,     ty + 1) === 6 ? 0 : tileCell(tx,     ty + 1);
+      let celldiag  = tileCell(tx + 1, ty + 1) === 6 ? 0 : tileCell(tx + 1, ty + 1);
 
       if (entity.dy > 0) {
         if ((celldown && !cell) ||
@@ -297,7 +304,10 @@ import MainMenu from './lib/main_menu.js';
 
   function frame() {
     const mainMenu = new MainMenu(playing);
-    if (player.state.dead) {
+    if (win) {
+      winScreen.style.display = "flex";
+    }
+    else if (player.state.dead) {
       gameOver.style.display = "flex";
     } else if (playing) {
       canvas.style.backgroundImage = `url(${background.src})`;
@@ -351,6 +361,10 @@ import MainMenu from './lib/main_menu.js';
 
   function restartPlay(){
     return (e) => {
+      if (win === true) {
+        win = false;
+        winScreen.style.display = "none";
+      }
       player = {};
       monsters = [];
       treasure = [];
@@ -368,6 +382,7 @@ import MainMenu from './lib/main_menu.js';
   document.addEventListener('keyup',   function(ev) { return onKey(ev, ev.keyCode, false); }, false);
   playButton.addEventListener('click', play());
   retryButton.addEventListener('click', restartPlay());
+  playAgainButton.addEventListener('click', restartPlay());
 
     setup(level);
     frame();
