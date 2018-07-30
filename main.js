@@ -43,6 +43,8 @@ import MainMenu from './lib/main_menu.js';
   let cells    = [];
   const playButton = document.getElementById('play-button');
   const mainMenu = document.getElementById('main-menu');
+  const gameOver = document.getElementById('game-over');
+  const retryButton = document.getElementById('retry-button');
   let playing = false;
 
   const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
@@ -57,7 +59,6 @@ import MainMenu from './lib/main_menu.js';
 }
 
   function render(ctx, frame, dt) {
-
     ctx.clearRect(0, 0, width, height);
     cells.render(ctx, mapTiles);
     player.render(ctx, dt);
@@ -293,7 +294,9 @@ import MainMenu from './lib/main_menu.js';
 
   function frame() {
     const mainMenu = new MainMenu(playing);
-    if (playing) {
+    if (player.state.dead) {
+      gameOver.style.display = "flex";
+    } else if (playing) {
       canvas.style.backgroundImage = `url(${background.src})`;
       canvas.style.backgroundSize = 'cover';
       fpsmeter.tickStart();
@@ -307,7 +310,7 @@ import MainMenu from './lib/main_menu.js';
       last = now;
       fpsmeter.tick();
       requestAnimationFrame(frame, canvas);
-    } else {
+    } else if (playing === false && !player.state.dead){
       canvas.style.background = "none";
     }
   }
@@ -343,12 +346,25 @@ import MainMenu from './lib/main_menu.js';
     };
   }
 
+  function restartPlay(){
+    return (e) => {
+      player = {};
+      monsters = [];
+      treasure = [];
+      cells    = [];
+      gameOver.style.display = "none";
+      setup(level);
+      frame();
+    };
+  }
+
 // TODO: figure out how to stop holding down space bar from triggering jump
 
   document.addEventListener('keydown', function(ev) {
     return onKey(ev, ev.keyCode, true);  }, false);
   document.addEventListener('keyup',   function(ev) { return onKey(ev, ev.keyCode, false); }, false);
   playButton.addEventListener('click', play());
+  retryButton.addEventListener('click', restartPlay());
 
     setup(level);
     frame();
