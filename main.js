@@ -22,6 +22,8 @@ import MainMenu from './lib/main_menu.js';
   const monster_assets = GameUtil.loadMonsterImages();
   const background = GameUtil.loadBackground();
   const mapTiles = GameUtil.loadMapTextures();
+  const exit_assets = GameUtil.loadExit();
+  ,
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -72,7 +74,7 @@ import MainMenu from './lib/main_menu.js';
     let obj;
     let entity;
     let monster;
-    cells = new Stage(data, GameUtil.MAP.totalWidth, GameUtil.MAP.totalHeight);
+    cells = new Stage(data, GameUtil.MAP.totalWidth, GameUtil.MAP.totalHeight, exit_assets);
     for(n = 0 ; n < objects.length ; n++) {
       obj = objects[n];
       entity = setupEntity(obj);
@@ -126,6 +128,7 @@ import MainMenu from './lib/main_menu.js';
   function update(dt) {
     updatePlayer(dt);
     updateMonsters(dt);
+    cells.tick();
   }
 
   function updatePlayer(dt) {
