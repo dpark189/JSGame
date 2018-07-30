@@ -128,12 +128,14 @@ import MainMenu from './lib/main_menu.js';
   }
 
   function updatePlayer(dt) {
-
-    updateEntity(player, dt);
+    if (!player.state.dead) {
+      updateEntity(player, dt);
+    } else {
+      player.render(ctx, dt);
+    }
   }
 
   function updateMonsters(dt) {
-
     let max = monsters.length;
     for (let i = 0; i < max; i++) {
       updateMonster(monsters[i], dt);
@@ -157,6 +159,8 @@ import MainMenu from './lib/main_menu.js';
         if ((player.state.dy > 0) && (monster.state.y - player.state.y > GameUtil.TILE/2)) {
           monster.killed();
           player.state.killed++;
+        } else {
+          player.killPlayer();
         }
       }
       if (
@@ -308,25 +312,26 @@ import MainMenu from './lib/main_menu.js';
     }
   }
 
-let fired = false;
   function onKey (e, key, down) {
-    switch(key) {
-      case GameUtil.KEY.LEFT:
+    if (!player.state.dead){
+      switch(key) {
+        case GameUtil.KEY.LEFT:
         player.changeState({'left': down, 'facing': false});
         e.preventDefault(); return false;
-      case GameUtil.KEY.RIGHT:
+        case GameUtil.KEY.RIGHT:
         player.changeState({'right': down, 'facing': true});
         e.preventDefault();
         return false;
-      case GameUtil.KEY.SPACE:
+        case GameUtil.KEY.SPACE:
         player.changeState({'jump': down});
         e.preventDefault();
         return false;
-      case GameUtil.KEY.Z:
+        case GameUtil.KEY.Z:
         if (!player.state.attacking) {
           player.changeState({'attacking': true});
         }
-      return false;
+        return false;
+      }
     }
   }
 
