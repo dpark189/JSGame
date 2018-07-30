@@ -4,6 +4,7 @@ import Player from './lib/player.js';
 import Monster from './lib/monster.js';
 import * as GameUtil from './lib/utils.js';
 import SpriteSheet from './assets/sprite_sheet.js';
+import MainMenu from './lib/main_menu.js';
 
 (() => {
 
@@ -40,6 +41,9 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let monsters = [];
   let treasure = [];
   let cells    = [];
+  const playButton = document.getElementById('play-button');
+  const mainMenu = document.getElementById('main-menu');
+  let playing = false;
 
   const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
   const pixelToTile   = (p) =>     { return Math.floor(p/GameUtil.TILE);};
@@ -53,7 +57,7 @@ import SpriteSheet from './assets/sprite_sheet.js';
 }
 
   function render(ctx, frame, dt) {
-    debugger
+
     ctx.clearRect(0, 0, width, height);
     cells.render(ctx, mapTiles);
     player.render(ctx, dt);
@@ -284,18 +288,24 @@ import SpriteSheet from './assets/sprite_sheet.js';
   let fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
 
   function frame() {
-    fpsmeter.tickStart();
-    now = timestamp();
-    dt += Math.min(1, (now - last) / 1000);
-    while (dt > step) {
-      dt -= step;
-      update(step);
+    const mainMenu = new MainMenu(playing);
+    if (playing) {
+      canvas.style.backgroundImage = `url(${background.src})`;
+      canvas.style.backgroundSize = 'cover';
+      fpsmeter.tickStart();
+      now = timestamp();
+      dt += Math.min(1, (now - last) / 1000);
+      while (dt > step) {
+        dt -= step;
+        update(step);
+      }
+      render(ctx, dt);
+      last = now;
+      fpsmeter.tick();
+      requestAnimationFrame(frame, canvas);
+    } else {
+      canvas.style.background = "none";
     }
-
-    render(ctx, dt);
-    last = now;
-    fpsmeter.tick();
-    requestAnimationFrame(frame, canvas);
   }
 
 let fired = false;
@@ -320,11 +330,20 @@ let fired = false;
     }
   }
 
+  function play(e) {
+    return (e) => {
+      playing = true;
+      mainMenu.style.display = "none";
+      frame();
+    };
+  }
+
 // TODO: figure out how to stop holding down space bar from triggering jump
 
   document.addEventListener('keydown', function(ev) {
     return onKey(ev, ev.keyCode, true);  }, false);
   document.addEventListener('keyup',   function(ev) { return onKey(ev, ev.keyCode, false); }, false);
+  playButton.addEventListener('click', play());
 
     setup(level);
     frame();
