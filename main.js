@@ -28,6 +28,7 @@ import gameSound from './lib/sound.js';
   const mainMenuMusic = new Audio('./assets/sound/Zabutom_-_Sine_ride.mp3');
   const playingMusic = new Audio('./assets/sound/Breakbeat_Heartbeat_Refract.mp3');
   playingMusic.volume = 0.2;
+  let currentMusic;
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -187,7 +188,8 @@ import gameSound from './lib/sound.js';
           monster.killed();
           player.state.killed++;
         } else {
-          player.killPlayer();
+          if (monster.state.dying || monster.state.dead){}
+          else { player.killPlayer();}
         }
       }
       if (
@@ -326,6 +328,7 @@ import gameSound from './lib/sound.js';
     else if (player.state.dead) {
       gameOver.style.display = "flex";
     } else if (playing) {
+      currentMusic = playingMusic;
       canvas.style.backgroundImage = `url(${background.src})`;
       canvas.style.backgroundSize = 'cover';
       fpsmeter.tickStart();
@@ -340,9 +343,7 @@ import gameSound from './lib/sound.js';
       fpsmeter.tick();
       requestAnimationFrame(frame, canvas);
     } else if (playing === false && !player.state.dead){
-      if (audioAllowed){
-        menuMusic.play();
-      }
+      currentMusic = mainMenuMusic;
       canvas.style.background = "none";
     }
   }
@@ -373,7 +374,7 @@ import gameSound from './lib/sound.js';
   function play(e) {
     return (e) => {
       playing = true;
-      menuMusic.stop();
+      currentMusic.pause();
       if (audioAllowed) {
         playingMusic.play();
       }
@@ -403,20 +404,23 @@ import gameSound from './lib/sound.js';
   function toggleAudio(){
     return (e) => {
       audioAllowed = !audioAllowed;
+      if (audioAllowed) {
+        currentMusic.play();
+      } else {currentMusic.pause();}
     };
   }
 
-  function mainMenuToggle(){
-    return(e) => {
-      audioAllowed = !audioAllowed;
-      if (audioAllowed){
-        mainMenuMusic.play();
-      }
-      else {
-        mainMenuMusic.stop();
-      }
-    };
-  }
+  // function mainMenuToggle(){
+  //   return(e) => {
+  //     audioAllowed = !audioAllowed;
+  //     if (audioAllowed){
+  //       mainMenuMusic.play();
+  //     }
+  //     else {
+  //       mainMenuMusic.stop();
+  //     }
+  //   };
+  // }
 
 
 // TODO: figure out how to stop holding down space bar from triggering jump
@@ -428,7 +432,7 @@ import gameSound from './lib/sound.js';
   retryButton.addEventListener('click', restartPlay());
   playAgainButton.addEventListener('click', restartPlay());
   toggleAudioButton.addEventListener('click', toggleAudio());
-  mainMenuToggleAudioButton.addEventListener('click', mainMenuToggle());
+  // mainMenuToggleAudioButton.addEventListener('click', mainMenuToggle());
 
     setup(level);
     frame();
