@@ -7,6 +7,48 @@
   background-color: black;
 }
 
+#main-menu > button {
+  z-index: 2;
+  margin-left: 60%;
+}
+
+#main-menu > figure {
+  margin: 0;
+  animation: imageAnimation 30s linear infinite 0s;
+  backface-visibility: hidden;
+  background-size: cover;
+  background-position: center center;
+  color: transparent;
+  height: 100%;
+  left: 0px;
+  opacity: 0;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 0;
+}
+
+@keyframes
+imageAnimation {  0% {
+   animation-timing-function: ease-in;
+   opacity: 0;
+  }
+   8% {
+   animation-timing-function: ease-out;
+   opacity: 1;
+  }
+   17% {
+   opacity: 1
+  }
+   25% {
+   opacity: 0
+  }
+   100% {
+   opacity: 0
+  }
+}
+
+
 #game-over {
   position: absolute;
   background-color: black;

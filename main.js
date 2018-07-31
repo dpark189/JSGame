@@ -23,6 +23,7 @@ import MainMenu from './lib/main_menu.js';
   const background = GameUtil.loadBackground();
   const mapTiles = GameUtil.loadMapTextures();
   const exit_assets = GameUtil.loadExit();
+  const mainMenuFigures = GameUtil.loadMainMenuBackground();
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
   }
@@ -52,6 +53,10 @@ import MainMenu from './lib/main_menu.js';
   const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
   const pixelToTile   = (p) =>     { return Math.floor(p/GameUtil.TILE);};
   const tileCell      = (tx,ty) => { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
+
+  mainMenuFigures.forEach( figure => {
+    mainMenu.appendChild(figure);
+  });
 
   function overlap(x1, y1, w1, h1, x2, y2, w2, h2) {
   return !(((x1 + w1 - 1) < x2) ||
