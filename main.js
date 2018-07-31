@@ -27,6 +27,7 @@ import gameSound from './lib/sound.js';
   const mainMenuFigures = GameUtil.loadMainMenuBackground();
   const mainMenuMusic = new Audio('./assets/sound/Zabutom_-_Sine_ride.mp3');
   const playingMusic = new Audio('./assets/sound/Breakbeat_Heartbeat_Refract.mp3');
+  playingMusic.volume = 0.2;
 
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -54,6 +55,7 @@ import gameSound from './lib/sound.js';
   const winScreen = document.getElementById('win-screen');
   const platformerDiv = document.getElementById('platformer');
   const toggleAudioButton = document.getElementById('toggle-audio-button');
+  const mainMenuToggleAudioButton = document.getElementById('main-menu-toggle-audio-button');
   let playing = false;
   let win = false;
   let audioAllowed = false;
@@ -372,7 +374,9 @@ import gameSound from './lib/sound.js';
     return (e) => {
       playing = true;
       menuMusic.stop();
-      playingMusic.play();
+      if (audioAllowed) {
+        playingMusic.play();
+      }
       mainMenu.visibility = "hidden";
       mainMenu.opacity = "0";
       setTimeout(() => {mainMenu.style.display = "none";}, 2000);
@@ -399,8 +403,18 @@ import gameSound from './lib/sound.js';
   function toggleAudio(){
     return (e) => {
       audioAllowed = !audioAllowed;
-      if (audioAllowed) { menuMusic.play(); }
-      else { menuMusic.stop(); }
+    };
+  }
+
+  function mainMenuToggle(){
+    return(e) => {
+      audioAllowed = !audioAllowed;
+      if (audioAllowed){
+        mainMenuMusic.play();
+      }
+      else {
+        mainMenuMusic.stop();
+      }
     };
   }
 
@@ -414,6 +428,7 @@ import gameSound from './lib/sound.js';
   retryButton.addEventListener('click', restartPlay());
   playAgainButton.addEventListener('click', restartPlay());
   toggleAudioButton.addEventListener('click', toggleAudio());
+  mainMenuToggleAudioButton.addEventListener('click', mainMenuToggle());
 
     setup(level);
     frame();
