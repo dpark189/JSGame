@@ -180,7 +180,7 @@ import gameSound from './lib/sound.js';
 // )
 // ) {
   function updateMonster(monster, dt) {
-    if (!monster.state.dead) {
+    if (!monster.state.dead || !monster.state.dying) {
       updateEntity(monster, dt);
       if (overlap(player.state.x, player.state.y, GameUtil.TILE, GameUtil.TILE, monster.state.x, monster.state.y, GameUtil.TILE, GameUtil.TILE)) {
         if ((player.state.dy > 0) && (monster.state.y - player.state.y > GameUtil.TILE/2)) {
