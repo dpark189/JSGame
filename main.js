@@ -359,7 +359,9 @@ import MainMenu from './lib/main_menu.js';
   function play(e) {
     return (e) => {
       playing = true;
-      mainMenu.style.display = "none";
+      mainMenu.visibility = "hidden";
+      mainMenu.opacity = "0";
+      setTimeout(() => {mainMenu.style.display = "none";}, 2000);
       frame();
     };
   }
