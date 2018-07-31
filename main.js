@@ -5,6 +5,7 @@ import Monster from './lib/monster.js';
 import * as GameUtil from './lib/utils.js';
 import SpriteSheet from './assets/sprite_sheet.js';
 import MainMenu from './lib/main_menu.js';
+import gameSound from './lib/sound.js';
 
 (() => {
 
@@ -24,6 +25,9 @@ import MainMenu from './lib/main_menu.js';
   const mapTiles = GameUtil.loadMapTextures();
   const exit_assets = GameUtil.loadExit();
   const mainMenuFigures = GameUtil.loadMainMenuBackground();
+  const mainMenuMusic = new Audio('./assets/sound/Zabutom_-_Sine_ride.mp3');
+  const playingMusic = new Audio('./assets/sound/Breakbeat_Heartbeat_Refract.mp3');
+
   function timestamp() {
     return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
   }
@@ -48,8 +52,13 @@ import MainMenu from './lib/main_menu.js';
   const retryButton = document.getElementById('retry-button');
   const playAgainButton = document.getElementById('play-again');
   const winScreen = document.getElementById('win-screen');
+  const platformerDiv = document.getElementById('platformer');
+  const toggleAudioButton = document.getElementById('toggle-audio-button');
   let playing = false;
   let win = false;
+  let audioAllowed = false;
+  const menuMusic = new gameSound(platformerDiv, mainMenuMusic);
+  menuMusic.playbackRate = 0.7;
   const tileToPixel   = (t) =>     { return t*GameUtil.TILE;};
   const pixelToTile   = (p) =>     { return Math.floor(p/GameUtil.TILE);};
   const tileCell      = (tx,ty) => { return cells.state.data[tx + (ty*GameUtil.MAP.totalWidth)];};
@@ -329,12 +338,15 @@ import MainMenu from './lib/main_menu.js';
       fpsmeter.tick();
       requestAnimationFrame(frame, canvas);
     } else if (playing === false && !player.state.dead){
+      if (audioAllowed){
+        menuMusic.play();
+      }
       canvas.style.background = "none";
     }
   }
 
   function onKey (e, key, down) {
-    if (!player.state.dead){
+    if ((typeof player === "undefined") || (!player.state.dead)){
       switch(key) {
         case GameUtil.KEY.LEFT:
         player.changeState({'left': down, 'facing': false});
@@ -359,6 +371,8 @@ import MainMenu from './lib/main_menu.js';
   function play(e) {
     return (e) => {
       playing = true;
+      menuMusic.stop();
+      playingMusic.play();
       mainMenu.visibility = "hidden";
       mainMenu.opacity = "0";
       setTimeout(() => {mainMenu.style.display = "none";}, 2000);
@@ -382,6 +396,15 @@ import MainMenu from './lib/main_menu.js';
     };
   }
 
+  function toggleAudio(){
+    return (e) => {
+      audioAllowed = !audioAllowed;
+      if (audioAllowed) { menuMusic.play(); }
+      else { menuMusic.stop(); }
+    };
+  }
+
+
 // TODO: figure out how to stop holding down space bar from triggering jump
 
   document.addEventListener('keydown', function(ev) {
@@ -390,6 +413,7 @@ import MainMenu from './lib/main_menu.js';
   playButton.addEventListener('click', play());
   retryButton.addEventListener('click', restartPlay());
   playAgainButton.addEventListener('click', restartPlay());
+  toggleAudioButton.addEventListener('click', toggleAudio());
 
     setup(level);
     frame();
