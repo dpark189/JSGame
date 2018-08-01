@@ -318,7 +318,7 @@ import gameSound from './lib/sound.js';
   let dt = 0;
   let now;
   let last = timestamp();
-  let fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
+  let fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', right: '5px' });
 
   function frame() {
     const mainMenu = new MainMenu(playing);
