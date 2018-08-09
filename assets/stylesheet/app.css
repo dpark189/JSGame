@@ -107,6 +107,7 @@ body {
 .contact-image {
   width: 45px;
   height: 45px;
+  margin-right: 10px;
 }
 
 ul {
@@ -115,34 +116,33 @@ ul {
 }
 
 li {
-  margin-left: -14px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   text-align: center;
 }
 
-a {
+a.contact {
+  font-size: 7px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
 .contact-me {
-  font-size: 7px;
+  font-size: 10px;
   display: flex;
   justify-content: center;
   flex-direction: column;
   width: 125px;
   flex-wrap: wrap;
+  margin-right: 50px;
 }
 #platformer {
   margin: 1em auto;
   position: relative;
   width: 512px;
   height: 384px;
-
-
 }
 #canvas {
   display: inline-block;
