@@ -152,16 +152,23 @@ a.contact {
   background-size: cover;
 }
 #instructions {
+  display: flex;
+  flex-direction: column;
   font-style: italic;
   color: #999;
-  font-size: 9pt;
-  margin-left: 1em;
+  font-size: 7pt;
   margin-top: 0.5em;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 #instructions b {
   color: #DDD;
 }
+#instructions > ul > li {
+  margin-bottom: 5px;
+}
+
 @media screen and (min-width: 0px) and (min-height: 0px) {
   #platformer {
     width: 512px;
