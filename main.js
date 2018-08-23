@@ -189,7 +189,10 @@ import gameSound from './lib/sound.js';
           player.state.killed++;
         } else {
           if (monster.state.dying || monster.state.dead){}
-          else { player.killPlayer();}
+          else {
+            debugger
+            player.killPlayer();
+          }
         }
       }
       if (
