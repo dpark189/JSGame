@@ -242,7 +242,8 @@ import gameSound from './lib/sound.js';
       else if (wasRight)
         entity.ddx = entity.ddx - friction;
 
-      if (entity.jump && !entity.jumping && !falling) {
+      if (entity.jump && !entity.jumping && !entity.falling && entity.jumpCount === 0) {
+        entity.jumpCount += 1;
         entity.ddy = entity.ddy - entity.impulse;
         entity.jumping = true;
       }
@@ -362,7 +363,11 @@ import gameSound from './lib/sound.js';
         e.preventDefault();
         return false;
         case GameUtil.KEY.SPACE:
-        player.changeState({'jump': down});
+          let jumpCount = down ? player.state.jumpCount : 0;
+          player.changeState({
+            'jump': down,
+            'jumpCount': jumpCount,
+          });
         e.preventDefault();
         return false;
         case GameUtil.KEY.Z:
@@ -429,8 +434,9 @@ import gameSound from './lib/sound.js';
 // TODO: figure out how to stop holding down space bar from triggering jump
 
   document.addEventListener('keydown', function(ev) {
-    return onKey(ev, ev.keyCode, true);  }, false);
-  document.addEventListener('keyup',   function(ev) { return onKey(ev, ev.keyCode, false); }, false);
+      return onKey(ev, ev.keyCode, true);  }, false);
+  document.addEventListener('keyup',   function(ev) {
+    return onKey(ev, ev.keyCode, false);   }, false);
   playButton.addEventListener('click', play());
   retryButton.addEventListener('click', restartPlay());
   playAgainButton.addEventListener('click', restartPlay());
