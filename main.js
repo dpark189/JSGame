@@ -190,7 +190,6 @@ import gameSound from './lib/sound.js';
         } else {
           if (monster.state.dying || monster.state.dead){}
           else {
-            debugger
             player.killPlayer();
           }
         }
@@ -429,9 +428,6 @@ import gameSound from './lib/sound.js';
   //     }
   //   };
   // }
-
-
-// TODO: figure out how to stop holding down space bar from triggering jump
 
   document.addEventListener('keydown', function(ev) {
       return onKey(ev, ev.keyCode, true);  }, false);
