@@ -16,3 +16,4 @@ Play as an Adventurer exploring the wild, fighting monsters, and collecting trea
 
 ## Notes
 First off, this game is not meant for sale or for monetary profit. The purpose of this game was for experience and as a personal project. 
+
